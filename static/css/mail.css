@@ -1,0 +1,42 @@
+.body_main {
+    width:100%;
+    min-width:100%;
+    height:100%;
+}
+.send_mail {
+    padding:70px 0;
+    background:#f7f8f9;
+}
+.send_mail_pw {
+    margin:0 auto;
+    width:600px;
+    color:#000;
+}
+.send {
+    padding:30px 90px;
+    text-align:center;
+    border:1px solid #dfdfdf;
+    background:#fff;
+}
+.mail_title {
+    margin-bottom:35px;
+    font-size:30px;
+    font-weight:600;
+}
+.mail_body {
+    padding:10px 0 20px;
+    border-top:1px solid rgb(172, 172, 172);
+}
+.mail_font {
+    font-size:14px;
+    font-weight:600;
+    line-height:20px;
+}
+.auth_div {
+    padding:20px 30px;
+    background:#f7f8f9;
+}
+.auth_font {
+    font-size:18px;
+    font-weight:bold;
+}

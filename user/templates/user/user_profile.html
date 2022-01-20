@@ -1,0 +1,351 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <!-- jquery 사용하기 위해 -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <link href="https://fonts.googleapis.com/css?family=Material+Icons|Material+Icons+Outlined|Material+Icons+Two+Tone|Material+Icons+Round|Material+Icons+Sharp"
+    rel="stylesheet">
+     {% load static %}
+    <link href="{% static 'css/user.css' %}" rel="stylesheet">
+    <title>DaliyShare-내 정보 </title>
+</head>
+<!-- 내비게이션 시작 -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="/">DaliyShare</a>
+          <div>
+          <a href="/"><span class="material-icons-outlined px-4">home</span></a>
+          <span id="add_box" class="material-icons-outlined px-4">add_to_photos</span>
+          <span class="material-icons-outlined px-4">question_answer</span>
+          <a href="{% url 'logout' %}"><span class="material-icons-outlined px-4">logout</span></a>
+          </div>
+      </div>
+    </nav>
+ <!-- 내비게이션 끝 -->
+<body>
+ <!-- 바디 영역 -->
+    <div class="base profile_main_body">
+        <div class="info">
+            <!-- 유저 상세 정보 -->
+            <div class="flex_row">
+                <div class="info_user_img">
+                    <img class="user_img" src="{{ user.user_img.url }}" alt="Your Image">
+                </div>
+                <div class="flex_col" style="margin:40px 80px">
+                    <div class="mb-3 flex_row">
+                        <div style="font-size:24px"> {{ user.user_id }} </div>
+                        <div>
+                            <button id="user_update_btn" type="button" class="user_img_change_btn" >
+                                프로필사진 변경
+                            </button>
+                            <input id="ajaxFile" type="file" onchange="ajaxFileChange()" name="profile" style="display:none">
+                        </div>
+                    </div>
+                    <div class="flex_row">
+                        <div style="margin-right:30px"> 게시물 <b>{{ box_count }}</b> </div>
+                        <div style="margin-right:30px"> 팔로워 <b>{{ follower_count }}</b></div>
+                        <div style="margin-right:30px"> 팔로우 <b>{{ following_count }}</b></div>
+                        <span id="follow_you" class="material-icons-outlined">person_add</span>
+                    </div>
+                </div>
+            </div>
+            <!-- 게시물, 북마크 head -->
+            <div class="choice flex_row">
+                <div target_id="menu_box" class="menu_content flex_row head_border">
+                    <span class="material-icons-outlined">border_all</span>게시물 </div>
+                <div target_id="menu_bookmark" class="menu_content head_bookmark">
+                    <span class="material-icons-outlined">bookmarks</span>북마크 </div>
+            </div>
+            <!-- 게시물, 북마크 목록  -->
+            <div id="menu_box" class="menu_content_box flex_col">
+                {% for box in box_list %}
+                    <div class="flex_row">
+                        {% for row_box in box.row_box_list %}
+                            <div>
+                                <img class="row_box" src="{{ row_box.box_img.url }}">
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endfor %}
+            </div>
+            <div id="menu_bookmark" class="menu_content_box" style="display:none; flex-direction:column">
+                {% for box in bookmark_list %}
+                    <div class="flex_row">
+                        {% for row_box in box.row_bookmark_list %}
+                            <div>
+                               <img class="row_box" src="{{ row_box.box_img.url }}" alt="Your Box Image">
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 사진 업로드 모달(첫번째 모달) -->
+<div id="modal_add_box" class="modal">
+    <div class="modal_window">
+        <div class="modal_title">
+            <div class="modal_title_side"></div>
+            <div style="margin:5px"> 새 게시물 등록하기 </div>
+                <span class="modal_close material-icons-outlined">
+                    close</span>
+        </div>
+        <div class="modal_image_upload">
+        </div>
+    </div>
+</div>
+<!-- 사진 업로드 후 내용 작성(두번째 모달) -->
+<div id="modal_add_box_content" class="modal">
+    <div class="modal_window">
+        <div class="modal_title">
+            <div class="modal_title_side"></div>
+            <div style="margin:5px"> 새 게시물 등록하기</div>
+            <div class="modal_title_side">
+                <span class="modal_close material-icons-outlined" style="font-size: 30px">
+                    close
+                </span>
+            </div>
+        </div>
+        <div class="modal_image_content">
+            <div id="modal_box_img" class="modal_image_upload_content">
+            </div>
+            <div class="modal_content">
+                <div class="box_user">
+                    <div class="box_user_img">
+                        <img id="modal_user_img" class="user_img" src="{{ user.user_img.url }}">
+                    </div>
+                    <span id="modal_user_id"> {{ user.user_id }} </span>
+                </div>
+                <div style="height:440px">
+                    <textarea id="modal_box_content" class="box_textarea" rows="10"
+                              placeholder="문구 입력"></textarea>
+                </div>
+                <div style="width:100%; text-align:center">
+                    <button id="box_upload_btn" type="button" class="btn btn-dark" style="width:268px"> 공유하기
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+ <!-- 모달 띄우기 코드(박스 업로드:2개) -->
+    const modal = document.getElementById("modal_add_box");
+    const buttonAddBox = document.getElementById("add_box");
+    buttonAddBox.addEventListener("click", e => {
+        modal.style.top = window.pageYOffset + 'px'; // top을 이용해 시작 y위치를 바꿔줌
+        modal.style.display = "flex";
+        document.body.style.overflowY = "hidden"; // 스크롤 없애기
+    });
+
+    <!-- 모달 닫기 -->
+    $('.modal_close').on("click", () => {
+        close();
+    });
+
+    function close() {
+        $('.modal').css({
+            display: 'none'
+        });
+        $(document.body).css({
+            overflowY: 'visible'
+        });
+    };
+
+    <!-- 네비게이션 + 를 눌렀을 때(박스 업로드) -->
+    $('.modal_image_upload')
+        .on("dragover", dragOver)
+        .on("dragleave", dragOver)
+        .on("drop", uploadFiles);
+
+    function dragOver(e){
+        e.stopPropagation();
+        e.preventDefault();
+
+        if (e.type == "dragover") {
+            $(e.target).css({
+                "background-color": "black",
+                "outline-offset": "-20px"
+            });
+        } else {
+            $(e.target).css({
+                "background-color": "white",
+                "outline-offset": "-10px"
+            });
+        }
+    };
+
+    function uploadFiles(e){
+        e.stopPropagation();
+        e.preventDefault();
+        console.log(e.dataTransfer)
+        console.log(e.originalEvent.dataTransfer)
+
+        e.dataTransfer = e.originalEvent.dataTransfer;
+
+        files = e.dataTransfer.files;
+        if (files.length > 1) {
+            alert('하나의 이미지 파일만 가능합니다.');
+            return;
+        }
+
+        if (files[0].type.match(/image.*/)) {
+            $('#modal_add_box_content').css({
+                display: 'flex'
+            });
+            $('.modal_image_upload_content').css({
+                "background-image": "url(" + window.URL.createObjectURL(files[0]) + ")",
+                "outline": "none",
+                "background-size": "contain",
+                "background-repeat": "no-repeat",
+                "background-position": "center"
+            });
+            $('#modal_add_image').css({
+                display: 'none'
+            })
+        } else {
+            alert('이미지 파일이 아닙니다.');
+            return;
+        }
+    };
+    <!-- 모달에서 '등록하기' 눌렀을 때 -->
+    $('#box_upload_btn').on('click', () => {
+        const box_img = $('#modal_box_img').css("background-image").replace(/^url\(['"](.+)['"]\)/, '$1');
+        const box_content = $('#modal_box_content').val();
+        const user_img = $('#modal_user_img').attr('src');
+        const user_id = $.trim($('#modal_user_id').text());
+        const file = files[0];
+
+        let bx = new FormData();
+
+        bx.append('file', file);
+        bx.append('box_img', box_img);
+        bx.append('box_content', box_content);
+        bx.append('user_img', user_img);
+        bx.append('user_id', user_id);
+
+
+        if (box_img.length <= 0) {
+            alert("등록된 이미지가 없습니다.");
+        } else if (box_content.length <= 0) {
+            alert("설명을 입력하세요");
+        } else if (user_img.length <= 0) {
+            alert("프로필 이미지가 비어있습니다.");
+        } else if (user_id.length <= 0) {
+            alert("사용자의 닉네임이 없습니다.");
+        } else {
+            createBox(bx);
+            console.log(files[0]);
+        }
+
+    });
+
+    function createBox(bx) {
+        $.ajax({
+            url: "/box/upload/",
+            data: bx,
+            method: "POST",
+            processData: false,
+            contentType: false,
+            success: function (data) {
+                console.log("박스 업로드 성공");
+            },
+            error: function (request, status, error) {
+                console.log("문제 발생");
+            },
+            complete: function () {
+                console.log("실행");
+                close();
+                location.reload();
+            }
+        })
+    };
+
+
+
+
+<!-- 게시글과 북마크 클릭시 -->
+$('.menu_content').click(function (event){
+        $('.menu_content').css({
+            'border-top': 'none',
+            'font-weight' : 'lighter'
+        });
+        $(this).css({
+            'border-top' : '1px solid gray',
+            'font-weight' : 'bold'
+        });
+
+        $('.menu_content_box').css({
+            display : 'none'
+        });
+
+        let target_id = $(this).attr('target_id')
+
+        $('#'+target_id).css({
+            display : 'flex'
+        });
+    });
+
+
+<!-- 사용자 이미지 변경 -->
+$('#user_update_btn').on('click', () => {
+        // 업로드 버튼이 클릭되면 파일 찾기 창을 띄움
+        $("#ajaxFile").click();
+    });
+
+    function ajaxFileChange() {
+        // 파일이 선택되면 업로드를 진행
+        ajaxFileTransmit();
+    }
+
+    function ajaxFileTransmit() {
+        var formData = new FormData();
+        formData.append("file", $("#ajaxFile")[0].files[0]);
+
+        $.ajax({
+              url : "/user/update",
+              type : "POST",
+              processData : false,
+              contentType : false,
+              data : formData,
+              dataType: "json",
+             success:function() {
+                console.log('업데이트 성공');
+             }
+        });
+    }
+     <!-- 팔로우 버튼 클릭 -->
+    $('#follow_you').on('click', () => {
+        let active = false;
+
+        $.ajax({
+            url: "/user/insert/follow",
+            type: "POST",
+            dataType: "json",
+            async: false,
+            data: {
+                following: '{{ user.user_email }}',
+                active : active
+            },
+            success:function() {
+                console.log("팔로우 성공");
+            },
+            error:function (request, status, error){
+               console.log("팔로우 문제 발생");
+            }
+        });
+    });
+
+
+</script>
+</body>
+</html>

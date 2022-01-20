@@ -1,0 +1,209 @@
+.base {
+    background-color:#FAFAFA;
+}
+.body-div {
+    font-size:14px;
+    text-align:center;
+    min-height:100vh;
+    display:flex;
+    flex-direction:row;
+    align-items:center;
+    justify-content:center;
+}
+.user-form {
+    background-color:white;
+    width:400px;
+    height:auto;
+    border:1px solid rgba(0, 0, 0, 0.18);
+}
+.title-sub {
+    font-size:15px;
+    color:gray;
+ }
+.form-set {
+    width:60%;
+    margin:30px 80px;
+    align-items:center;
+    justify-content: center;
+}
+a {
+    color:black;
+    text-decoration:none;
+ }
+
+ /*
+ user_profile.html
+ */
+.profile_main_body {
+    display:flex;
+    justify-content:center;
+    padding-top:50px;
+    z-index:1;
+ }
+ /* user_profile 회색 바탕 */
+.info {
+    display:flex;
+    justify-content:center;
+    flex-direction:column;
+    min-width:780px;
+ }
+ /* div:info에서 보여줄 user_img */
+.info_user_img {
+    width:150px;
+    height:150px;
+    border-radius:70%;
+    overflow:hidden;
+    margin:30px;
+}
+/* user_img */
+.user_img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+/* modal_image_content */
+.flex_row {
+    display:flex;
+    flex-direction:row;
+}
+.flex_col {
+    display:flex;
+    flex-direction: column;
+}
+/* 프로필 사진 변경 버튼 */
+.user_img_change_btn {
+    margin-left:10px;
+    font-size:14px;
+    width:120px;
+    border:1px solid gray;
+    background-color:transparent;
+ }
+ .follow_btn {
+    margin-left:10px;
+    font-size:14px;
+    width:auto;
+    border:1px solid gray;
+    background-color:transparent;
+ }
+ /* 게시물과 북마크 head */
+.choice {
+    font-size:14px;
+    padding:10 140px;
+    border-top:1px solid silver;
+    width:100%;
+    justify-content:space-evenly;
+}
+/* 게시물 */
+.head_border {
+    align-items:center;
+    padding:10px 0 30px 0;
+    border-top:1px solid gray;
+    font-size:17px;
+    font-weight:middle;
+}
+/* 북마크 */
+.head_bookmark {
+    align-items:center;
+    padding-top:10px;
+    font-size:17px;
+    font-weight:middle;
+}
+
+/* modal */
+.modal {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    left: 0;
+    top: 0;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(1.5px);
+    -webkit-backdrop-filter: blur(1.5px);
+}
+.modal_window {
+    background:white;
+    backdrop-filter:blur(13.5px);
+    border-radius:10px;
+    border:1px solid rgba(255, 255, 255, 0.18);
+    width:800px;
+    height:600px;
+    position:relative;
+    padding:10px;
+    -webkit-backdrop-filter:blur(13.5px);
+}
+.modal_title{
+    display:flex;
+    flex-direction:row;
+    justify-content:space-between;
+    font-weight:bold;
+    font-size:20px;
+ }
+.modal_title_side{
+    flex:0 0 40px;
+    text-align:center;
+}
+.modal_image_upload{
+    outline: 1px solid black ;
+    outline-offset:-10px;
+    text-align: center;
+    transition: all .15s ease-in-out;
+    width:780px;
+    height: 548px;
+}
+.modal_image_upload_content{
+    outline: 2px dashed black ;
+    outline-offset:-10px;
+    text-align: center;
+    transition: all .15s ease-in-out;
+    width:500px;
+    height: 548px;
+}
+
+.modal_image_content{
+     display: flex;
+     flex-direction: row;
+}
+.modal_content{
+     display: flex;
+     flex-direction: column;
+     border-left: 1px solid rgba(0, 0, 0, 0.18);;
+}
+.box_textarea {
+    resize:none;
+    width:294px;
+    border:none;
+    outline:none;
+}
+.box_name {
+   padding: 10px;
+   display: flex;
+   align-items: center;
+}
+.row_box {
+    width: 240px;
+    height: 240px;
+    object-fit: cover;
+    margin: 10px;
+}
+.box_name_txt {
+     font-size: 14px;
+     padding: 0px 10px;
+     font-weight: bold;
+}
+.user_box {
+    width:40px;
+    height:40px;
+    border-radius:70%;
+    overflow:hidden;
+}
+.box_content_textarea {
+    resize: none;
+    width: 294px;
+    border: none;
+}
+
+

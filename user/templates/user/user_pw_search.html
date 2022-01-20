@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <!-- jquery 사용하기 위해 -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <link href="https://fonts.googleapis.com/css?family=Material+Icons|Material+Icons+Outlined|Material+Icons+Two+Tone|Material+Icons+Round|Material+Icons+Sharp"
+    rel="stylesheet">
+     {% load static %}
+    <link href="{% static 'css/user.css' %}" rel="stylesheet">
+    <title>DaliyShare-비밀번호 찾기</title>
+</head>
+<!-- 내비게이션 시작 -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="#">DaliyShare</a>
+          <div>
+          <span class="material-icons-outlined px-4">home</span>
+          <span id="add_image" class="material-icons-outlined px-4">add_to_photos</span>
+          <span class="material-icons-outlined px-4">favorite</span>
+          <span class="material-icons-outlined px-4">question_answer</span>
+          <span class="material-icons-outlined px-4">account_circle</span>
+          </div>
+      </div>
+    </nav>
+ <!-- 내비게이션 끝 -->
+<body class="base">
+<div class="body-div">
+    <div>
+        <div class="mb-3 py-3 user-form">
+            <span style="font-size:30px"><b>DALIYSHARE</b></span><br>
+            <span class="title-sub">일상 공유 플랫폼</span>
+        <div style="margin-top:50px">
+            {% csrf_token %}
+            <input type="text" class="form-control form-set" placeholder="이메일을 입력하세요" id="user_email">
+            <input type="text" class="form-control form-set" placeholder="이름을 입력하세요" id="user_name">
+              <div id="result_pw"></div>
+            <input id="pw-search-btn" type="button" class="btn btn-dark" value="비밀번호 찾기" style="width:60%">
+        </div>
+            <div class="my-4">
+                 <a href="{% url 'email_search' %}">아이디 찾기</a> | <a href="{% url 'login' %}">로그인</a> | <a href="{% url 'signup' %}">회원가입</a>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+        $('#pw-search-btn').on('click', ()=>{
+            let user_email = $('#user_email').val();
+            let user_name = $('#user_name').val();
+
+
+            $.ajax({
+                url:'/user/pw/auth/send',
+                type:"POST",
+                dataType:"json",
+                data: {
+                        user_email : user_email,
+                        user_name : user_name
+                },
+                success:function(response){
+                        alert('입력하신 이메일로 인증코드를 발송하였습니다');
+                         $('#result_pw').replaceWith(
+                           '<hr><div class="row justify-content-md-center"><form class="form-inline" style="margin-bottom:-15px; margin-top:-10px;"><div class="md-form md-outline"><label for="input_auth_num">인증번호 입력 (<span id="timeset"></span>)</label><input type="text" id="input_auth_num" class="form-set mx-sm-2" autofocus/></div></form>'+
+                           '<div><button type="submit" name="auth_confirm" id="email_auth_confirm" class="btn btn-outline-dark" style="width:80px; font-size: 12px;">인증확인</button></div></div><hr>'
+                           )
+                      function countdown( elementName, minutes, seconds ) {
+                               var elementName, endTime, hours, mins, msLeft, time;
+                               function twoDigits( n ) {
+                                         return (n <= 9 ? "0" + n : n);
+                               }
+                               function updateTimer() {
+                                       msLeft = endTime - (+new Date);
+                                       if ( msLeft < 1000 ) {
+                                       alert("인증시간이 초과되었습니다.");
+                                       $("" + elementName).remove();
+                                       cert_ok = false;
+                                       certificationNum = false;
+                                       location.href = "{% url 'pw_search' %}"
+                                       } else {
+                                               time = new Date( msLeft );
+                                               hours = time.getUTCHours();
+                                               mins = time.getUTCMinutes();
+                                               $("" + elementName).html((hours ? hours + ':' + twoDigits( mins ) : twoDigits(mins))
+                                                + ':' + twoDigits( time.getUTCSeconds()));
+                                                setTimeout( updateTimer, time.getUTCMilliseconds() + 500 );
+                                       }
+                              }
+                              endTime = (+new Date) + 1000 * (60*minutes + seconds) + 500;
+                              updateTimer();
+                      }
+                      countdown("#timeset", 5, 0);
+                      var user = response.result
+
+                 $('#email_auth_confirm').on('click', ()=>{
+                         var input_auth_num = $("#input_auth_num").val();
+
+                        $.ajax({
+                            type: "POST",
+                            url: "/user/pw/auth/confirm",
+                            dataType: "json",
+                            data: {
+                                 user_email: user,
+                                 input_auth_num: input_auth_num,
+                            },
+                            success: function (response) {
+                                         location.href = "{% url 'pw_change' %}";
+                            },
+                            error: function () {
+                                        if ($('#input_auth_num').val()=="") {
+                                             alert('회원님의 이메일로 전송된 인증번호를 입력해주세요.');
+                                        } else {
+                                             alert('인증번호가 일치하지 않습니다.');
+                                        }
+                            }
+                        });
+                 });
+                },
+                error: function () {
+                             if (user_email == "" || user_name == "" ) {
+                                  alert('이메일과 이름을 입력해주세요.');
+                             } else {
+                                  alert('입력하신 정보가 일치하지 않거나 존재하지 않습니다.');
+                             }
+               }
+
+            });
+        });
+</script>
+</body>
+</html>

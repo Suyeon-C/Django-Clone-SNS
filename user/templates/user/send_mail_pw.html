@@ -1,0 +1,21 @@
+{% autoescape off %}
+<html>
+{% load static %}
+    <link href="{% static 'css/mail.css' %}" rel="stylesheet">
+<body>
+    <div class="body_main">
+        <div class="send_mail">
+            <div class="send_mail_pw">
+                <div class="send">
+                    <h3 class="mail_title">비밀번호 찾기 인증번호 발송</h3>
+                    <div class="mail_body">
+                        <p class="mail_font"> DAILYSHARE 비밀번호찾기 인증번호입니다.<br>아래 인증번호를 인증번호 입력란에 입력해주세요.</p>
+                    </div>
+                    <div class="auth_div"><p class="auth_font">{{ auth_num }}</p></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+{% endautoescape %}

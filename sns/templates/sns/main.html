@@ -1,0 +1,431 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- jquery 사용하기 위해 -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
+            crossorigin="anonymous"></script>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <link href="https://fonts.googleapis.com/css?family=Material+Icons|Material+Icons+Outlined|Material+Icons+Two+Tone|Material+Icons+Round|Material+Icons+Sharp"
+          rel="stylesheet">
+    {% load static %}
+    <link href="{% static 'css/main.css' %}" rel="stylesheet">
+    <title>DaliyShare</title>
+</head>
+<!-- 내비게이션 시작 -->
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="/">DaliyShare</a>
+        <div>
+            <a href="/"><span class="material-icons-outlined px-4">home</span></a>
+            <span id="add_box" class="material-icons-outlined px-4">add_to_photos</span>
+            <span class="material-icons-outlined px-4">favorite</span>
+            <span class="material-icons-outlined px-4">question_answer</span>
+            <a href="{% url 'profile' %}"><span class="material-icons-outlined px-4">account_circle</span></a>
+        </div>
+    </div>
+</nav>
+<!-- 내비게이션 끝 -->
+<body>
+<!-- 메인화면(왼쪽, 사용자의 등록된 박스를 보여줌) -->
+<div class="main_flame">
+    <div class="left_main">
+        {% for box in box_list %}
+        <div class="border left_main_box">
+            <div class="box_user">
+                <div class="box_user_img">
+                    <img class="user_img" src="{{ box.user_img.url }}" alt="User Image">
+                </div>
+                <span>{{ box.user_id }}</span>
+            </div>
+            <img class="box_img" src="{{ box.box_img.url }}" alt="Box Image">
+            <!-- 클릭 아이콘 -->
+          <div class="box_icon">
+          <div>
+          <span class="like_state material-icons-outlined" kid="{{ box.box_id }}">
+            {% if box.like %}
+                  favorite
+            {% else %}
+                 favorite_border
+            {% endif %}
+          </span>
+           <span class="material-icons-outlined">
+            mode_comment
+          </span>
+          <span class="material-icons-outlined">
+            send
+          </span>
+          </div>
+          <div>
+          <span class="bookmark_state material-icons-outlined" kid="{{ box.box_id }}">
+             {% if box.bookmark %}
+                turned_in
+             {% else %}
+                 turned_in_not
+             {% endif %}
+          </span>
+           </div>
+           </div>
+            <!-- 좋아요 수 -->
+            <div class="box_like">
+                <p> 좋아요 <b id="plus"> {{ box.num_of_like }}</b> 개</p>
+            </div>
+            <div class="box_content">
+                <p><b>{{ box.user_id }} </b> {{ box.box_content }}</p>
+            </div>
+            <div class="box_comment">
+                {% for comment in box.comment_list %}
+                <input type="hidden" id="delete_comment" kid="{{ comment.id }}">
+                <span><b>{{ comment.user_id }} </b>  <span id="delete_comment_fake" kid="{{ comment.id }}">{{ comment.content }}</span> </span>
+                {% endfor %}
+            </div>
+            <div class="div_create_comment">
+                <input type="text" class="create_comment" placeholder="댓글 달기...">
+                <span id="create_comment" class="{{ box.box_id }}"><b>게시</b></span>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+</div>
+
+<!-- 사진 업로드 모달(첫번째 모달) -->
+<div id="modal_add_box" class="modal">
+    <div class="modal_window">
+        <div class="modal_title">
+            <div class="modal_title_side"></div>
+            <div style="margin:5px"> 새 게시물 등록하기</div>
+            <span class="modal_close material-icons-outlined">
+                    close</span>
+        </div>
+        <div class="modal_image_upload">
+        </div>
+    </div>
+</div>
+<!-- 사진 업로드 후 내용 작성(두번째 모달) -->
+<div id="modal_add_box_content" class="modal">
+    <div class="modal_window">
+        <div class="modal_title">
+            <div class="modal_title_side"></div>
+            <div style="margin:5px"> 새 게시물 등록하기</div>
+            <div class="modal_title_side">
+                <span class="modal_close material-icons-outlined">
+                    close
+                </span>
+            </div>
+        </div>
+        <div class="modal_image_content">
+            <div id="modal_box_img" class="modal_image_upload_content">
+            </div>
+            <div class="modal_content">
+                <div class="box_user">
+                    <div class="box_user_img">
+                        <img id="modal_user_img" class="user_img" src="{{ user.user_img.url }}">
+                    </div>
+                    <span id="modal_user_id"> {{ user.user_id }} </span>
+                </div>
+                <div style="height:440px">
+                    <textarea id="modal_box_content" class="box_textarea" rows="10"
+                              placeholder="문구 입력"></textarea>
+                </div>
+                <div style="width:100%; text-align:center">
+                    <button id="box_upload_btn" type="button" class="btn btn-dark" style="width:268px"> 공유하기
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    <!-- 모달 띄우기 코드(박스 업로드:2개) -->
+    const modal = document.getElementById("modal_add_box");
+    const buttonAddBox = document.getElementById("add_box");
+    buttonAddBox.addEventListener("click", e => {
+        modal.style.top = window.pageYOffset + 'px'; // top을 이용해 시작 y위치를 바꿔줌
+        modal.style.display = "flex";
+        document.body.style.overflowY = "hidden"; // 스크롤 없애기
+    });
+
+    <!-- 모달 닫기 -->
+    $('.modal_close').on("click", () => {
+        close();
+    });
+
+    function close() {
+        $('.modal').css({
+            display: 'none'
+        });
+        $(document.body).css({
+            overflowY: 'visible'
+        });
+    };
+
+    <!-- 네비게이션 + 를 눌렀을 때(박스 업로드) -->
+    $('.modal_image_upload')
+        .on("dragover", dragOver)
+        .on("dragleave", dragOver)
+        .on("drop", uploadFiles);
+
+    function dragOver(e){
+        e.stopPropagation();
+        e.preventDefault();
+
+        if (e.type == "dragover") {
+            $(e.target).css({
+                "background-color": "black",
+                "outline-offset": "-20px"
+            });
+        } else {
+            $(e.target).css({
+                "background-color": "white",
+                "outline-offset": "-10px"
+            });
+        }
+    };
+
+    function uploadFiles(e){
+        e.stopPropagation();
+        e.preventDefault();
+        console.log(e.dataTransfer)
+        console.log(e.originalEvent.dataTransfer)
+
+        e.dataTransfer = e.originalEvent.dataTransfer;
+
+        files = e.dataTransfer.files;
+        if (files.length > 1) {
+            alert('하나의 이미지 파일만 가능합니다.');
+            return;
+        }
+
+        if (files[0].type.match(/image.*/)) {
+            $('#modal_add_box_content').css({
+                display: 'flex'
+            });
+            $('.modal_image_upload_content').css({
+                "background-image": "url(" + window.URL.createObjectURL(files[0]) + ")",
+                "outline": "none",
+                "background-size": "contain",
+                "background-repeat": "no-repeat",
+                "background-position": "center"
+            });
+            $('#modal_add_image').css({
+                display: 'none'
+            })
+        } else {
+            alert('이미지 파일이 아닙니다.');
+            return;
+        }
+    };
+    <!-- 모달에서 '등록하기' 눌렀을 때 -->
+    $('#box_upload_btn').on('click', () => {
+        const box_img = $('#modal_box_img').css("background-image").replace(/^url\(['"](.+)['"]\)/, '$1');
+        const box_content = $('#modal_box_content').val();
+        const user_img = $('#modal_user_img').attr('src');
+        const user_id = $.trim($('#modal_user_id').text());
+        const file = files[0];
+
+        let bx = new FormData();
+
+        bx.append('file', file);
+        bx.append('box_img', box_img);
+        bx.append('box_content', box_content);
+        bx.append('user_img', user_img);
+        bx.append('user_id', user_id);
+
+
+        if (box_img.length <= 0) {
+            alert("등록된 이미지가 없습니다.");
+        } else if (box_content.length <= 0) {
+            alert("설명을 입력하세요");
+        } else if (user_img.length <= 0) {
+            alert("프로필 이미지가 비어있습니다.");
+        } else if (user_id.length <= 0) {
+            alert("사용자의 닉네임이 없습니다.");
+        } else {
+            createBox(bx);
+            console.log(files[0]);
+        }
+
+    });
+
+    function createBox(bx) {
+        $.ajax({
+            url: "/box/upload/",
+            data: bx,
+            method: "POST",
+            processData: false,
+            contentType: false,
+            success: function (data) {
+                console.log("박스 업로드 성공");
+            },
+            error: function (request, status, error) {
+                console.log("문제 발생");
+            },
+            complete: function () {
+                console.log("실행");
+                close();
+                location.reload();
+            }
+        })
+    };
+
+
+    <!-- 댓글 등록 -- 1/18일 성공>
+    $('#create_comment').on("click", () => {
+            let success = false;
+            let content = $('.create_comment').val();
+            let box_id =  Number($('.like_state').attr('kid'));
+            console.log(box_id);
+
+            $.ajax({
+                url:"/box/comment/create",
+                data: {
+                   content : content,
+                   box_id : box_id,
+                   user_email: '{{ user.user_email }}',
+                   user_id : '{{ user.user_id}}'
+                },
+                type:"POST",
+                dataType: "json",
+                async: false, <!-- 동기식 처리 -->
+                success:function(data) {
+
+                },
+                error:function (request, status, error) {
+
+                }
+            });
+            if(success == true){
+            $(this).parent().prev().append('<span><b> {{ user.user_id }} </b> '+ content +' </span>');
+        }
+    });
+
+    <!-- 댓글 삭제 1/20 성공--->
+    $('#delete_comment_fake').on('click', () => {
+        let success = false;
+        let comment_id = Number($('#delete_comment').attr('kid'));
+        console.log(comment_id);
+
+        $.ajax({
+            url:"/box/comment/delete",
+            method: "POST",
+            data: {
+            comment_id:comment_id,
+            user_email: '{{ user.user_email }}',
+            },
+            dataType: "json",
+            async: false,
+            success:function(data) {
+                console.log(comment_id);
+                console.log(data.message);
+                success=true
+                alert("댓글 삭제 성공");
+            },
+            error:function (request, status, error) {
+                let data = JSON.parse(request.responseText);
+                console.log(data.message);
+
+            }
+        });
+    });
+
+
+
+
+
+    <!-- 좋아요 누르기  1/18일 성공-->
+    $('.like_state').on("click", () => {
+        let success = false;
+        let icon = ($('.like_state').html()).trim();
+        console.log('지금현재 상태 : ' + icon);
+        let like = false;
+        if(icon == "favorite_border"){
+            like = true;
+        }
+        console.log(like);
+        let box_id = Number($('.like_state').attr('kid'));
+        console.log(box_id);
+        $.ajax({
+            url: "/box/like",
+            data: {
+                user_email: '{{ user.user_email }}',
+                like: like,
+                box_id: box_id
+            },
+            method: "POST",
+            dataType: "json",
+            async: false,
+            success: function (data){
+                success = true
+            },
+            error:function (request, status, error){
+               console.log("문제 발생");
+            }
+        });
+        console.log(success)
+        if(success == true){
+            console.log(like)
+            if(like){
+                $('.like_state').html('favorite');
+                let num_of_like_object = $(this).parent().parent().next().find('p').find('b');
+                let num_of_like = Number(num_of_like_object.html());
+                num_of_like_object.html(num_of_like + 1);
+                console.log(num_of_like);
+            }else{
+                $('.like_state').html('favorite_border');
+                let num_of_like_object = $(this).parent().parent().next().find('p').find('b');
+                let num_of_like = Number(num_of_like_object.html());
+                num_of_like_object.html(num_of_like - 1);
+                console.log(num_of_like);
+            }
+        }
+    });
+
+    <!-- 북마크 누르기 -->
+    $('.bookmark_state').click(function() {
+        let success = false;
+        let icon = ($('.bookmark_state').html()).trim();
+        console.log('지금 현재 상태 : ' + icon);
+        let bookmark = false;
+        if(icon == "turned_in_not"){
+            bookmark = true;
+        }
+        console.log(bookmark);
+        let box_id = Number($('.bookmark_state').attr('kid'));
+        console.log(box_id);
+
+        $.ajax({
+            url: "/box/bookmark",
+            data: {
+                user_email: '{{ user.user_email }}',
+                bookmark: bookmark,
+                box_id: box_id
+            },
+            method: "POST",
+            dataType: "json",
+            async: false,
+            success: function (data){
+                success=true
+            },
+            error:function (request, status, error){
+
+            }
+        });
+        if(success == true){
+            if(bookmark){
+                $('.bookmark_state').html('turned_in');
+            }else{
+                $('.bookmark_state').html('turned_in_not');
+            }
+        }
+    });
+
+</script>
+</body>
+</html>
